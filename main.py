@@ -15,9 +15,9 @@ def get_links():  # request to ALL_JSON to access scoreboard
 
 def get_scoreboard():  # send request for currentscoreboard, then print
     scoreboard = get_links()["currentscoreboard"]
-    games = get(BASE_URL + scoreboard).json()["games"] # accessing list
+    games = get(BASE_URL + scoreboard).json()["games"]  # accessing list
 
-    for game in games: # printiing individual list item
+    for game in games:  # loop through and printiing individual list item
         home_team = game["hTeam"]
         away_team = game["vTeam"]
         clock = game["clock"]
@@ -27,6 +27,23 @@ def get_scoreboard():  # send request for currentscoreboard, then print
         print(f"{home_team["tricode"]} vs {away_team["tricode"]}, {clock}, {period}")
         print(f"{home_team["score"]} - {away_team["score"]}")
         print(f"{clock} - {period['current']}")
+
+
+def get_stats():
+    stats = get_links()["leagueTeamStatsLeaders"]
+    teams = get(
+        BASE_URL + stats).json()["league"]["standard"]["regularSeason"]["teams"]
+
+    teams = list(filter(lambda x: x["team" != "Team"], teams))
+    # runs anon function on every element to filter
+    #  where team key doesn't equal team. returns object, not list
+    teams.sort(key=lambda x: int(x["ppg"]["rank"]))  # ppg is dict containing ranks, sort desc after converting to int
+
+    for i, team in enumerate(teams):
+        name = team["name"]
+        nickname = team["nickname"]
+        ppg = team["ppg"]["avg"]
+        print(f"{i + 1}. {name} - {nickname}, {ppg}")
 
 
 get_scoreboard()
